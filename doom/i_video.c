@@ -153,7 +153,67 @@ void cmap_to_rgb565(uint16_t * out, uint8_t * in, int in_pixels)
     }
 }
 
+// QHPC optimization: finished 32-bit pixels for each of the 256 palette
+// colours, rebuilt only when the palette changes (see I_SetPalette).
+// pal64 holds the same pixel twice, so 2x horizontal scaling is one store.
+static uint32_t pal32[256];
+static uint64_t pal64[256];
+static boolean pal_dirty = true;
+
+static void rebuild_palette_tables(void)
+{
+    int i;
+
+    for (i = 0; i < 256; i++)
+    {
+        // Same expression the original per-pixel code used.
+        uint32_t pix = (colors[i].r << s_Fb.red.offset) |
+                       (colors[i].g << s_Fb.green.offset) |
+                       (colors[i].b << s_Fb.blue.offset);
+#ifdef SYS_BIG_ENDIAN
+        pix = swapLE32(pix);
+#endif
+        pal32[i] = pix;
+        pal64[i] = (uint64_t)pix | ((uint64_t)pix << 32);
+    }
+    pal_dirty = false;
+}
+
+// Original conversion, kept for the 16 bpp (rgb565) mode.
+static void cmap_to_fb_generic(uint8_t *out, uint8_t *in, int in_pixels);
+
 void cmap_to_fb(uint8_t *out, uint8_t *in, int in_pixels)
+{
+    int i, k;
+
+    if (s_Fb.bits_per_pixel != 32)
+    {
+        cmap_to_fb_generic(out, in, in_pixels);
+        return;
+    }
+
+    if (fb_scaling == 2)
+    {
+        // One table lookup and one 8-byte store per input pixel.
+        for (i = 0; i < in_pixels; i++)
+        {
+            uint64_t two = pal64[in[i]];
+            memcpy(out + i * 8, &two, 8);   // compiles to a single store
+        }
+    }
+    else
+    {
+        uint32_t *o = (uint32_t *) out;
+        for (i = 0; i < in_pixels; i++)
+        {
+            uint32_t pix = pal32[in[i]];
+            for (k = 0; k < fb_scaling; k++)
+                *o++ = pix;
+        }
+    }
+}
+
+static void cmap_to_fb_generic(uint8_t *out, uint8_t *in, int in_pixels)
 {
     int i, k;
     struct color c;
@@ -339,9 +399,15 @@ void I_FinishUpdate (void)
 
     y = SCREENHEIGHT;
 
+#ifndef CMAP256
+    if (pal_dirty)
+        rebuild_palette_tables();
+#endif
+
     while (y--)
     {
         int i;
+        unsigned char *first_row = NULL;
         for (i = 0; i < fb_scaling; i++) {
             line_out += x_offset;
 #ifdef CMAP256
@@ -358,8 +424,15 @@ void I_FinishUpdate (void)
                 }
             }
 #else
-            //cmap_to_rgb565((void*)line_out, (void*)line_in, SCREENWIDTH);
-            cmap_to_fb((void*)line_out, (void*)line_in, SCREENWIDTH);
+            // Vertical scaling repeats the same row, so convert it once
+            // and copy it for the remaining fb_scaling - 1 rows.
+            if (i == 0) {
+                cmap_to_fb((void*)line_out, (void*)line_in, SCREENWIDTH);
+                first_row = line_out;
+            } else {
+                memcpy(line_out, first_row,
+                       SCREENWIDTH * fb_scaling * (s_Fb.bits_per_pixel/8));
+            }
 #endif
             line_out += (SCREENWIDTH * fb_scaling * (s_Fb.bits_per_pixel/8)) + x_offset_end;
         }
@@ -411,6 +484,8 @@ void I_SetPalette (byte* palette)
         colors[i].g = gammatable[usegamma][*palette++];
         colors[i].b = gammatable[usegamma][*palette++];
     }
+
+    pal_dirty = true;   // rebuild pal32/pal64 before the next frame
 
 #ifdef CMAP256
 
