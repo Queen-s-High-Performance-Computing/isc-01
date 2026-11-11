@@ -29,9 +29,18 @@
 #define FRACBITS		16
 #define FRACUNIT		(1<<FRACBITS)
 
+#include <stdint.h>
+
 typedef int fixed_t;
 
-fixed_t FixedMul	(fixed_t a, fixed_t b);
+// QHPC optimization: FixedMul is called ~22 million times per demo but is
+// one multiply. Defined here as static inline so every file can inline it
+// instead of paying for a function call. Same maths as the original.
+static inline fixed_t FixedMul(fixed_t a, fixed_t b)
+{
+    return ((int64_t) a * (int64_t) b) >> FRACBITS;
+}
+
 fixed_t FixedDiv	(fixed_t a, fixed_t b);
 
 

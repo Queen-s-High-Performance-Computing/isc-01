@@ -129,20 +129,39 @@ void R_DrawColumn (void)
     fracstep = dc_iscale; 
     frac = dc_texturemid + (dc_yl-centery)*fracstep; 
 
-    // Inner loop that does the actual texture mapping,
-    //  e.g. a DDA-lile scaling.
-    // This is as fast as it gets.
-    do 
+    // QHPC optimization:
+    // - Copy the globals into locals. Writing through the byte pointer
+    //   `dest` could legally change any global, so with globals the
+    //   compiler must reload dc_source/dc_colormap on every pixel.
+    // - Unroll by 4 so the CPU can overlap independent pixels.
+    // Same pixels, same order, same fixed-point maths as the original.
     {
-	// Re-map color indices from wall texture column
-	//  using a lighting/special effects LUT.
-	*dest = dc_colormap[dc_source[(frac>>FRACBITS)&127]];
-	
-	dest += SCREENWIDTH; 
-	frac += fracstep;
-	
-    } while (count--); 
-} 
+        const byte *source = dc_source;
+        const lighttable_t *colormap = dc_colormap;
+        int pixels = count + 1;
+
+        while (pixels >= 4)
+        {
+            dest[0]             = colormap[source[(frac>>FRACBITS)&127]];
+            frac += fracstep;
+            dest[SCREENWIDTH]   = colormap[source[(frac>>FRACBITS)&127]];
+            frac += fracstep;
+            dest[SCREENWIDTH*2] = colormap[source[(frac>>FRACBITS)&127]];
+            frac += fracstep;
+            dest[SCREENWIDTH*3] = colormap[source[(frac>>FRACBITS)&127]];
+            frac += fracstep;
+            dest += SCREENWIDTH*4;
+            pixels -= 4;
+        }
+
+        while (pixels--)
+        {
+            *dest = colormap[source[(frac>>FRACBITS)&127]];
+            dest += SCREENWIDTH;
+            frac += fracstep;
+        }
+    }
+}
 
 
 
@@ -592,8 +611,6 @@ void R_DrawSpan (void)
     unsigned int position, step;
     byte *dest;
     int count;
-    int spot;
-    unsigned int xtemp, ytemp;
 
 #ifdef RANGECHECK
     if (ds_x2 < ds_x1
@@ -622,20 +639,38 @@ void R_DrawSpan (void)
     // We do not check for zero spans here?
     count = ds_x2 - ds_x1;
 
-    do
+    // QHPC optimization: locals instead of globals (see R_DrawColumn)
+    // and unrolled by 4. Same pixels and same maths as the original:
+    // texture index = (y part: (position >> 4) & 0x0fc0) | (x part: position >> 26)
     {
-	// Calculate current texture index in u,v.
-        ytemp = (position >> 4) & 0x0fc0;
-        xtemp = (position >> 26);
-        spot = xtemp | ytemp;
+        const byte *source = ds_source;
+        const lighttable_t *colormap = ds_colormap;
+        int pixels = count + 1;
 
-	// Lookup pixel from flat texture tile,
-	//  re-index using light/colormap.
-	*dest++ = ds_colormap[ds_source[spot]];
+#define SPAN_SPOT(p) ((((p) >> 4) & 0x0fc0) | ((p) >> 26))
 
-        position += step;
+        while (pixels >= 4)
+        {
+            dest[0] = colormap[source[SPAN_SPOT(position)]];
+            position += step;
+            dest[1] = colormap[source[SPAN_SPOT(position)]];
+            position += step;
+            dest[2] = colormap[source[SPAN_SPOT(position)]];
+            position += step;
+            dest[3] = colormap[source[SPAN_SPOT(position)]];
+            position += step;
+            dest += 4;
+            pixels -= 4;
+        }
 
-    } while (count--);
+        while (pixels--)
+        {
+            *dest++ = colormap[source[SPAN_SPOT(position)]];
+            position += step;
+        }
+
+#undef SPAN_SPOT
+    }
 }
 
 
