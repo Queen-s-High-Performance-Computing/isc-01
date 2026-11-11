@@ -5,3 +5,8 @@ Scoring demo1: 1 run(s) of 30s on frnt201.frontenac.local, 16 CPUs
   run 1: 64 valid demos, 0 invalid
 SCORE: 64 valid demo1 demos in 30s (median of 1)
 
+Run on Tuesday Nov 10 at 7:37 
+Scoring demo1: 1 run(s) of 30s on frnt201.frontenac.local, 16 CPUs
+  run 1: 147 valid demos, 0 invalid
+SCORE: 147 valid demo1 demos in 30s (median of 1)
+Increase of 83 demos (129.69%) over previous run

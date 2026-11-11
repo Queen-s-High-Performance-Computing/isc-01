@@ -4,6 +4,8 @@ doom/doomgeneric
 doom/doomgeneric.map
 *.o
 
+*.env
+
 # Game data (downloaded by get_freedoom.sh)
 *.wad
 freedoom*.zip
