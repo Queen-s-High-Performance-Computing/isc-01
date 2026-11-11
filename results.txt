@@ -1,28 +1,29 @@
-Each sample counts as 0.01 seconds.
+ach sample counts as 0.01 seconds.
   %   cumulative   self              self     total           
  time   seconds   seconds    calls  ms/call  ms/call  name    
- 71.61      1.74     1.74  2862400     0.00     0.00  cmap_to_fb
-  7.41      1.92     0.18 10634192     0.00     0.00  R_DrawColumn
-  2.88      1.99     0.07   408634     0.00     0.00  R_RenderSegLoop
-  2.06      2.04     0.05     7156     0.01     0.01  DG_DrawFrame
-  1.65      2.08     0.04   122637     0.00     0.00  R_DrawSprite
-  1.44      2.12     0.04 21846512     0.00     0.00  FixedMul
-  1.23      2.15     0.03 13694107     0.00     0.00  R_MakeSpans
-  1.23      2.18     0.03    96391     0.00     0.00  R_DrawFuzzColumn
-  1.23      2.21     0.03        1    30.00    30.00  Z_CheckHeap
-  0.82      2.23     0.02  3133749     0.00     0.00  R_DrawMaskedColumn
-  0.82      2.25     0.02  1813858     0.00     0.00  R_DrawSpan
-  0.82      2.27     0.02   773225     0.00     0.00  R_ScaleFromGlobalAngle
-  0.82      2.29     0.02   624654     0.00     0.00  R_CheckPlane
-  0.82      2.31     0.02     7156     0.00     0.25  I_FinishUpdate
-  0.82      2.33     0.02                             _init
-  0.41      2.34     0.01  1813858     0.00     0.00  R_MapPlane
-  0.41      2.35     0.01   615944     0.00     0.00  R_FindPlane
-  0.41      2.36     0.01   408634     0.00     0.00  R_StoreWallRange
-  0.41      2.37     0.01   339032     0.00     0.00  R_Subsector
-  0.41      2.38     0.01   242758     0.00     0.00  P_CheckPosition
-  0.41      2.39     0.01   237291     0.00     0.00  V_DrawPatch
-  0.41      2.40     0.01   131249     0.00     0.00  R_DrawVisSprite
-  0.41      2.41     0.01     7117     0.00     0.00  P_UpdateSpecials
-  0.41      2.42     0.01                             R_PrecacheLevel
-  0.41      2.43     0.01                             cmap_to_rgb565
+ 27.71      0.23     0.23     7156     0.03     0.03  I_FinishUpdate
+ 18.07      0.38     0.15 10634192     0.00     0.00  R_DrawColumn
+ 12.05      0.48     0.10  1813858     0.00     0.00  R_DrawSpan
+  7.23      0.54     0.06   408634     0.00     0.00  R_RenderSegLoop
+  7.23      0.60     0.06   122637     0.00     0.00  R_DrawSprite
+  4.82      0.64     0.04  3133749     0.00     0.00  R_DrawMaskedColumn
+  3.61      0.67     0.03 13694107     0.00     0.00  R_MakeSpans
+  2.41      0.69     0.02   237291     0.00     0.00  V_DrawPatch
+  2.41      0.71     0.02     7156     0.00     0.00  DG_DrawFrame
+  2.41      0.73     0.02                             _init
+  1.20      0.74     0.01 21846512     0.00     0.00  FixedMul
+  1.20      0.75     0.01  3465430     0.00     0.00  R_PointToAngle
+  1.20      0.76     0.01  2462298     0.00     0.00  P_MobjThinker
+  1.20      0.77     0.01  1813858     0.00     0.00  R_MapPlane
+  1.20      0.78     0.01  1109330     0.00     0.00  R_AddLine
+  1.20      0.79     0.01   624654     0.00     0.00  R_CheckPlane
+  1.20      0.80     0.01   314645     0.00     0.00  P_BlockLinesIterator
+  1.20      0.81     0.01   242758     0.00     0.00  P_CheckPosition
+  1.20      0.82     0.01   131249     0.00     0.00  R_DrawVisSprite
+  1.20      0.83     0.01     7116     0.00     0.02  R_DrawPlanes
+  0.00      0.83     0.00  5128044     0.00     0.00  R_GetColumn
+  0.00      0.83     0.00  4706368     0.00     0.00  R_PointOnSide
+  0.00      0.83     0.00  3465430     0.00     0.00  SlopeDiv
+  0.00      0.83     0.00  2799469     0.00     0.00  Z_ChangeTag2
+  0.00      0.83     0.00  2646858     0.00     0.00  W_CacheLumpNum
+[sa6079079@frnt201 prof]$ 
