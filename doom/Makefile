@@ -2,7 +2,7 @@
 # Baseline flags are deliberately conservative (-O3 optimizes for performance).
 
 CC      = gcc
-CFLAGS  += -ggdb3 -O3 -Wall -DNORMALUNIX -DLINUX -DSNDSERV -D_DEFAULT_SOURCE -march=native
+CFLAGS  += -ggdb3 -O3 -Wall -DNORMALUNIX -DLINUX -DSNDSERV -D_DEFAULT_SOURCE -march=native -pg
 LDFLAGS += -Wl,--gc-sections
 LIBS    += -lm -lc
 
