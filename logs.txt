@@ -19,5 +19,7 @@ Updated profiling aswell.
 Run on Tuesday Nov 11 at 7:37
 115 valid, 0 invalid
 Decrease of 37 demos (-24.34%) over previous run
-Probably due to -03 instead of -O2, but will need to check.
+Probably due to -03 instead of -O2, but will need to check. Also added -makefile
+
+
 
