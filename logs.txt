@@ -22,4 +22,12 @@ Decrease of 37 demos (-24.34%) over previous run
 Probably due to -03 instead of -O2, but will need to check. Also added -makefile
 
 
+Run on Sat Nov 14 at 9:33
+164 valid, 0 invalid
+Increase of 49 demos (42.61%) over previous run
+Dont change makefile flags
+
+
+
+
 
