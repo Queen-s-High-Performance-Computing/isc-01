@@ -2156,7 +2156,9 @@ void G_DoPlayDemo (void)
     int demoversion;
 	 
     gameaction = ga_nothing; 
-    demobuffer = demo_p = W_CacheLumpName (defdemoname, PU_STATIC); 
+    if (!demobuffer)
+	demobuffer = W_CacheLumpName (defdemoname, PU_STATIC);
+    demo_p = demobuffer;
 
     demoversion = *demo_p++;
 
@@ -2247,17 +2249,10 @@ void G_TimeDemo (char* name)
  
 boolean G_CheckDemoStatus (void) 
 { 
-    int             endtime; 
-	 
     if (timingdemo) 
     { 
         // Timedemo: loop the same demo in-process to avoid restart overhead.
         // platform.c reports DGVALID when gametic resets on the next demo.
-        if (demobuffer)
-        {
-            W_ReleaseLumpName(defdemoname);
-            demobuffer = NULL;
-        }
         demoplayback = false;
         timingdemo = false;
         netdemo = false;
