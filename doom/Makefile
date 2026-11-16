@@ -2,9 +2,16 @@
 # Baseline flags are deliberately conservative (-O3 optimizes for performance).
 
 CC      = gcc
-CFLAGS  += -ggdb3 -O2 -Wall -DNORMALUNIX -DLINUX -DSNDSERV -D_DEFAULT_SOURCE -march=native
-LDFLAGS += -Wl,--gc-sections
+CFLAGS  += -O3 -DNDEBUG -Wall -DNORMALUNIX -DLINUX -DSNDSERV -D_DEFAULT_SOURCE -march=native -fomit-frame-pointer
+LDFLAGS +=
 LIBS    += -lm -lc
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+	LDFLAGS += -Wl,--gc-sections -Wl,-Map,$(OUTPUT).map
+else
+	LDFLAGS += -Wl,-dead_strip
+endif
 
 ifeq ($(V),1)
 	VB=
@@ -25,7 +32,7 @@ clean:
 
 $(OUTPUT): $(OBJS)
 	@echo [Linking $@]
-	$(VB)$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o $(OUTPUT) $(LIBS) -Wl,-Map,$(OUTPUT).map
+	$(VB)$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o $(OUTPUT) $(LIBS)
 
 $(OBJS): | $(OBJDIR)
 

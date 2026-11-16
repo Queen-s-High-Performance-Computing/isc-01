@@ -2251,19 +2251,26 @@ boolean G_CheckDemoStatus (void)
 	 
     if (timingdemo) 
     { 
-        float fps;
-        int realtics;
-
-	endtime = I_GetTime (); 
-        realtics = endtime - starttime;
-        fps = ((float) gametic * TICRATE) / realtics;
-
-        // Prevent recursive calls
-        timingdemo = false;
+        // Timedemo: loop the same demo in-process to avoid restart overhead.
+        // platform.c reports DGVALID when gametic resets on the next demo.
+        if (demobuffer)
+        {
+            W_ReleaseLumpName(defdemoname);
+            demobuffer = NULL;
+        }
         demoplayback = false;
+        timingdemo = false;
+        netdemo = false;
+        netgame = false;
+        deathmatch = false;
+        playeringame[1] = playeringame[2] = playeringame[3] = 0;
+        respawnparm = false;
+        fastparm = false;
+        nomonsters = false;
+        consoleplayer = 0;
 
-	I_Error ("timed %i gametics in %i realtics (%f fps)",
-                 gametic, realtics, fps);
+        G_TimeDemo (defdemoname);
+        return true;
     } 
 	 
     if (demoplayback) 
