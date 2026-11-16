@@ -2,7 +2,7 @@
 # Baseline flags are deliberately conservative (-O3 optimizes for performance).
 
 CC      = gcc
-CFLAGS  += -O2 -DNDEBUG -Wall -DNORMALUNIX -DLINUX -DSNDSERV -D_DEFAULT_SOURCE -march=native -fomit-frame-pointer
+CFLAGS  += -O2 -DNDEBUG -Wall -DNORMALUNIX -DLINUX -DSNDSERV -D_DEFAULT_SOURCE -march=native
 LDFLAGS +=
 LIBS    += -lm -lc
 
