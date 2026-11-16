@@ -59,7 +59,7 @@ if [ "$PIN" = 1 ] && command -v taskset >/dev/null 2>&1; then
     CPUS=($(ordered_cpus))
 fi
 
-COPIES=${COPIES:-$(nproc)}
+COPIES=${COPIES:-16}
 
 for i in $(seq 0 $((COPIES - 1))); do
     workdir="$RESULTS_DIR/w$i"   # each copy needs its own folder for its config file
